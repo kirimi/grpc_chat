@@ -2,9 +2,13 @@ import 'package:stormberry/stormberry.dart';
 
 late Database db;
 
-Database initDatabase() => Database(
+void initDatabase() {
+  db = Database(
     username: 'kirimi',
     password: 'kirimi',
     port: 4500,
     useSSL: false,
   );
+  db.debugPrint = true;
+  db.open();
+}

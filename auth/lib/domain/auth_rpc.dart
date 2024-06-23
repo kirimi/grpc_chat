@@ -10,9 +10,17 @@ import '../env.dart';
 
 class AuthRpc extends AuthRpcServiceBase {
   @override
-  Future<ResponseDto> deleteUser(ServiceCall call, RequestDto request) {
-    // TODO: implement deleteUser
-    throw UnimplementedError();
+  Future<ResponseDto> deleteUser(ServiceCall call, RequestDto request) async {
+    final userId = Utils.getUserIdFromMetadata(call);
+
+    final user = await db.users.queryUser(userId);
+    if (user == null) {
+      throw GrpcError.notFound('User not found');
+    }
+
+    await db.users.deleteOne(userId);
+
+    return ResponseDto(message: 'success');
   }
 
   @override
@@ -29,10 +37,6 @@ class AuthRpc extends AuthRpcServiceBase {
 
   @override
   Future<TokensDto> refreshtokens(ServiceCall call, TokensDto request) async {
-    if (!db.isOpen) {
-      db = initDatabase();
-    }
-
     if (request.refreshToken.isEmpty) {
       throw GrpcError.invalidArgument('Refresh token is empty');
     }
@@ -49,10 +53,6 @@ class AuthRpc extends AuthRpcServiceBase {
 
   @override
   Future<TokensDto> signIn(ServiceCall call, UserDto request) async {
-    if (!db.isOpen) {
-      db = initDatabase();
-    }
-
     if (request.email.isEmpty) {
       throw GrpcError.invalidArgument('Email is empty');
     }
@@ -77,10 +77,6 @@ class AuthRpc extends AuthRpcServiceBase {
 
   @override
   Future<TokensDto> signUp(ServiceCall call, UserDto request) async {
-    if (!db.isOpen) {
-      db = initDatabase();
-    }
-
     if (request.email.isEmpty) {
       throw GrpcError.invalidArgument('Email is empty');
     }
@@ -103,9 +99,26 @@ class AuthRpc extends AuthRpcServiceBase {
   }
 
   @override
-  Future<UserDto> updateUser(ServiceCall call, UserDto request) {
-    // TODO: implement updateUser
-    throw UnimplementedError();
+  Future<UserDto> updateUser(ServiceCall call, UserDto request) async {
+    final userId = Utils.getUserIdFromMetadata(call);
+
+    await db.users.updateOne(
+      UserUpdateRequest(
+        id: userId,
+        username: request.username.isEmpty ? null : request.username,
+        email: request.email.isEmpty ? null : Utils.encrypt(request.email),
+        password: request.password.isEmpty
+            ? null
+            : Utils.getHashPassword(request.password),
+      ),
+    );
+
+    final user = await db.users.queryUser(userId);
+    if (user == null) {
+      throw GrpcError.notFound('User not found');
+    }
+
+    return Utils.convertUserDto(user);
   }
 
   TokensDto _createTokens(String userId) {
