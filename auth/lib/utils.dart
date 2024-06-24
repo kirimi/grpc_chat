@@ -49,4 +49,12 @@ abstract class Utils {
         username: user.username,
         email: decrypt(user.email),
       );
+
+  static ListUserDto parseUsers(List<UserView> users) {
+    try {
+      return ListUserDto(users: [...users.map((e) => convertUserDto(e))]);
+    } catch (e) {
+      throw GrpcError.internal('Error in parseUsers ${e.toString()}');
+    }
+  }
 }
