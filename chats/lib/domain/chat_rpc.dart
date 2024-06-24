@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:isolate';
 
 import 'package:chats/data/chat/chat.dart';
@@ -6,9 +7,13 @@ import 'package:chats/data/message/message.dart';
 import 'package:chats/generated/chats.pbgrpc.dart';
 import 'package:chats/utils.dart';
 import 'package:grpc/grpc.dart';
+import 'package:protobuf/protobuf.dart';
 import 'package:stormberry/stormberry.dart';
 
 class ChatRpc extends ChatsRpcServiceBase {
+  final StreamController<MessageDto> _messageStreamController =
+      StreamController.broadcast();
+
   @override
   Future<ResponseDto> createChat(
     ServiceCall call,
@@ -91,7 +96,8 @@ class ChatRpc extends ChatsRpcServiceBase {
     }
 
     final userId = Utils.getUserIdFromMetadata(call);
-    if (chat.authorId != userId.toString() || chat.memberId != userId.toString()) {
+    if (chat.authorId != userId.toString() ||
+        chat.memberId != userId.toString()) {
       throw GrpcError.permissionDenied();
     }
 
@@ -113,11 +119,15 @@ class ChatRpc extends ChatsRpcServiceBase {
       throw GrpcError.invalidArgument('Body is empty');
     }
 
-    await db.messages.insertOne(MessageInsertRequest(
+    final messageId = await db.messages.insertOne(MessageInsertRequest(
       body: request.body,
       authorId: userId.toString(),
       chatId: chatId,
     ));
+
+    _messageStreamController.sink.add(request.deepCopy()
+      ..authorId = userId.toString()
+      ..id = messageId.toString());
 
     return ResponseDto(message: 'success');
   }
@@ -150,8 +160,11 @@ class ChatRpc extends ChatsRpcServiceBase {
   Stream<MessageDto> listenChat(
     ServiceCall call,
     ChatDto request,
-  ) {
-    // TODO: implement listenChat
-    throw UnimplementedError();
+  ) async* {
+    if (request.id.isEmpty) {
+      throw GrpcError.invalidArgument('Chat id is empty');
+    }
+    yield* _messageStreamController.stream
+        .where((message) => message.chatId == request.id);
   }
 }
