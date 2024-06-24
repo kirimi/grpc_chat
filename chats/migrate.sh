@@ -1,1 +1,1 @@
-DB_HOST_ADDRESS=localhost DB_PORT=4500 DB_NAME=postgres DB_SSL=false DB_USERNAME=kirimi DB_PASSWORD=kirimi dart run stormberry migrate
+DB_HOST_ADDRESS=localhost DB_PORT=4501 DB_NAME=postgres DB_SSL=false DB_USERNAME=kirimi DB_PASSWORD=kirimi dart run stormberry migrate

@@ -14,8 +14,10 @@ abstract class ChatRepository
         ModelRepositoryDelete<int> {
   factory ChatRepository._(Session db) = _ChatRepository;
 
-  Future<ChatView?> queryChat(int id);
-  Future<List<ChatView>> queryChats([QueryParams? params]);
+  Future<ShortChatView?> queryShortView(int id);
+  Future<List<ShortChatView>> queryShortViews([QueryParams? params]);
+  Future<FullChatView?> queryFullView(int id);
+  Future<List<FullChatView>> queryFullViews([QueryParams? params]);
 }
 
 class _ChatRepository extends BaseRepository
@@ -27,13 +29,23 @@ class _ChatRepository extends BaseRepository
   _ChatRepository(super.db) : super(tableName: 'chats', keyName: 'id');
 
   @override
-  Future<ChatView?> queryChat(int id) {
-    return queryOne(id, ChatViewQueryable());
+  Future<ShortChatView?> queryShortView(int id) {
+    return queryOne(id, ShortChatViewQueryable());
   }
 
   @override
-  Future<List<ChatView>> queryChats([QueryParams? params]) {
-    return queryMany(ChatViewQueryable(), params);
+  Future<List<ShortChatView>> queryShortViews([QueryParams? params]) {
+    return queryMany(ShortChatViewQueryable(), params);
+  }
+
+  @override
+  Future<FullChatView?> queryFullView(int id) {
+    return queryOne(id, FullChatViewQueryable());
+  }
+
+  @override
+  Future<List<FullChatView>> queryFullViews([QueryParams? params]) {
+    return queryMany(FullChatViewQueryable(), params);
   }
 
   @override
@@ -88,7 +100,38 @@ class ChatUpdateRequest {
   final String? authorId;
 }
 
-class ChatViewQueryable extends KeyedViewQueryable<ChatView, int> {
+class ShortChatViewQueryable extends KeyedViewQueryable<ShortChatView, int> {
+  @override
+  String get keyName => 'id';
+
+  @override
+  String encodeKey(int key) => TextEncoder.i.encode(key);
+
+  @override
+  String get query => 'SELECT "chats".*'
+      'FROM "chats"';
+
+  @override
+  String get tableAlias => 'chats';
+
+  @override
+  ShortChatView decode(TypedMap map) =>
+      ShortChatView(id: map.get('id'), name: map.get('name'), authorId: map.get('author_id'));
+}
+
+class ShortChatView {
+  ShortChatView({
+    required this.id,
+    required this.name,
+    required this.authorId,
+  });
+
+  final int id;
+  final String name;
+  final String authorId;
+}
+
+class FullChatViewQueryable extends KeyedViewQueryable<FullChatView, int> {
   @override
   String get keyName => 'id';
 
@@ -110,15 +153,15 @@ class ChatViewQueryable extends KeyedViewQueryable<ChatView, int> {
   String get tableAlias => 'chats';
 
   @override
-  ChatView decode(TypedMap map) => ChatView(
+  FullChatView decode(TypedMap map) => FullChatView(
       id: map.get('id'),
       name: map.get('name'),
       authorId: map.get('author_id'),
       messages: map.getListOpt('messages', MessageViewQueryable().decoder) ?? const []);
 }
 
-class ChatView {
-  ChatView({
+class FullChatView {
+  FullChatView({
     required this.id,
     required this.name,
     required this.authorId,

@@ -35,7 +35,7 @@ services:
       - '-c'
       - 'port=${db_port_auth}'
     volumes:
-      - db_auth_vol:/var/lib/postgres/data
+      - db_auth_vol:/var/lib/postgresql/data
     networks:
       - server_net
 
@@ -52,7 +52,7 @@ services:
       - '-c'
       - 'port=${db_port_chats}'
     volumes:
-      - db_chats_vol:/var/lib/postgres/data
+      - db_chats_vol:/var/lib/postgresql/data
     networks:
       - server_net      
 
