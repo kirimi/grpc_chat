@@ -43,11 +43,12 @@ class ChatRpc extends ChatsRpcServiceBase {
     ServiceCall call,
     ChatDto request,
   ) async {
-    if (request.id.isEmpty) {
-      throw GrpcError.invalidArgument('Chat id is empty');
+    final chatId = int.tryParse(request.id);
+    if (chatId == null) {
+      throw GrpcError.invalidArgument('Chat not found');
     }
 
-    final chat = await db.chats.queryShortView(int.parse(request.id));
+    final chat = await db.chats.queryShortView(chatId);
     if (chat == null) {
       throw GrpcError.notFound('Chat not found');
     }
@@ -86,11 +87,12 @@ class ChatRpc extends ChatsRpcServiceBase {
     ServiceCall call,
     ChatDto request,
   ) async {
-    if (request.id.isEmpty) {
-      throw GrpcError.invalidArgument('Chat id is empty');
+    final chatId = int.tryParse(request.id);
+    if (chatId == null) {
+      throw GrpcError.invalidArgument('Chat not found');
     }
 
-    final chat = await db.chats.queryFullView(int.parse(request.id));
+    final chat = await db.chats.queryFullView(chatId);
     if (chat == null) {
       throw GrpcError.notFound('Chat not found');
     }
@@ -109,16 +111,16 @@ class ChatRpc extends ChatsRpcServiceBase {
     ServiceCall call,
     MessageDto request,
   ) async {
-    final userId = Utils.getUserIdFromMetadata(call);
+    if (request.body.isEmpty) {
+      throw GrpcError.invalidArgument('Body is empty');
+    }
+
     final chatId = int.tryParse(request.chatId);
     if (chatId == null) {
       throw GrpcError.invalidArgument('Chat not found');
     }
 
-    if (request.body.isEmpty) {
-      throw GrpcError.invalidArgument('Body is empty');
-    }
-
+    final userId = Utils.getUserIdFromMetadata(call);
     final messageId = await db.messages.insertOne(MessageInsertRequest(
       body: request.body,
       authorId: userId.toString(),
@@ -137,7 +139,8 @@ class ChatRpc extends ChatsRpcServiceBase {
     ServiceCall call,
     MessageDto request,
   ) async {
-    if (request.id.isEmpty) {
+    final messageId = int.tryParse(request.id);
+    if (messageId == null) {
       throw GrpcError.invalidArgument('Message id is empty');
     }
 
