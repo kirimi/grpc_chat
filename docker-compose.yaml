@@ -22,6 +22,25 @@ services:
       ACCESS_TOKEN_LIFE: 100
       REFRESH_TOKEN_LIFE: 200
 
+  chats:
+    container_name: chats
+    build: ./chats
+    depends_on:
+      - db_chats
+    ports:
+      - ${chats_port}:${chats_port}
+    networks: 
+      - server_net
+    environment:
+      PORT: ${chats_port}
+      SK: ${sk}
+      DB_HOST_ADDRESS: db_chats
+      DB_PORT: ${db_port_chats}
+      DB_USERNAME: ${db_user_chats}
+      DB_PASSWORD: ${db_password_chats}
+      DB_SSL: ${db_use_ssl} 
+      DB_SK: ${db_sk_chats}
+
   db_auth:
     container_name: db_auth
     ports:
