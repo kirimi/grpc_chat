@@ -145,6 +145,7 @@ class ChatDto extends $pb.GeneratedMessage {
     $core.String? name,
     $core.String? authorId,
     $core.Iterable<MessageDto>? messages,
+    $core.String? memberId,
   }) {
     final $result = create();
     if (id != null) {
@@ -159,6 +160,9 @@ class ChatDto extends $pb.GeneratedMessage {
     if (messages != null) {
       $result.messages.addAll(messages);
     }
+    if (memberId != null) {
+      $result.memberId = memberId;
+    }
     return $result;
   }
   ChatDto._() : super();
@@ -170,6 +174,7 @@ class ChatDto extends $pb.GeneratedMessage {
     ..aOS(2, _omitFieldNames ? '' : 'name')
     ..aOS(3, _omitFieldNames ? '' : 'authorId')
     ..pc<MessageDto>(4, _omitFieldNames ? '' : 'messages', $pb.PbFieldType.PM, subBuilder: MessageDto.create)
+    ..aOS(5, _omitFieldNames ? '' : 'memberId')
     ..hasRequiredFields = false
   ;
 
@@ -223,6 +228,15 @@ class ChatDto extends $pb.GeneratedMessage {
 
   @$pb.TagNumber(4)
   $core.List<MessageDto> get messages => $_getList(3);
+
+  @$pb.TagNumber(5)
+  $core.String get memberId => $_getSZ(4);
+  @$pb.TagNumber(5)
+  set memberId($core.String v) { $_setString(4, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasMemberId() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearMemberId() => clearField(5);
 }
 
 class MessageDto extends $pb.GeneratedMessage {

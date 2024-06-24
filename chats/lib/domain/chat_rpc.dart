@@ -18,11 +18,16 @@ class ChatRpc extends ChatsRpcServiceBase {
       throw GrpcError.invalidArgument('Chat name is empty');
     }
 
+    if (request.memberId.isEmpty) {
+      throw GrpcError.invalidArgument('Member id is empty');
+    }
+
     final userId = Utils.getUserIdFromMetadata(call);
 
     await db.chats.insertOne(ChatInsertRequest(
       name: request.name,
       authorId: userId.toString(),
+      memberId: request.memberId,
     ));
 
     return ResponseDto(message: 'success');
@@ -61,7 +66,7 @@ class ChatRpc extends ChatsRpcServiceBase {
     final userId = Utils.getUserIdFromMetadata(call);
     final listChats = await db.chats.queryShortViews(
       QueryParams(
-        where: "author_id='$userId'",
+        where: "author_id='$userId' OR member_id='$userId'",
       ),
     );
     if (listChats.isEmpty) {
@@ -86,7 +91,7 @@ class ChatRpc extends ChatsRpcServiceBase {
     }
 
     final userId = Utils.getUserIdFromMetadata(call);
-    if (chat.authorId != userId.toString()) {
+    if (chat.authorId != userId.toString() || chat.memberId != userId.toString()) {
       throw GrpcError.permissionDenied();
     }
 

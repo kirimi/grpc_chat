@@ -28,6 +28,7 @@ abstract class Utils {
                 id: chat.id.toString(),
                 name: chat.name,
                 authorId: chat.authorId,
+                memberId: chat.memberId
               ))
         ],
       );
@@ -41,6 +42,7 @@ abstract class Utils {
       id: chatView.id.toString(),
       name: chatView.name,
       authorId: chatView.authorId,
+      memberId: chatView.memberId,
       messages: [
         ...chatView.messages.map((messageView) => parseMessage(messageView))
       ],

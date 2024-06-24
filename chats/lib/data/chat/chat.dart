@@ -10,6 +10,7 @@ abstract class Chat{
   int get id;
   String get name;
   String get authorId;
+  String? get memberId;
 
   @HiddenIn(#Short)
   List<Message> get messages;
