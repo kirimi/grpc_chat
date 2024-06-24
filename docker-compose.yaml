@@ -17,7 +17,7 @@ services:
       DB_PORT: ${db_port_auth}
       DB_USERNAME: ${db_user_auth}
       DB_PASSWORD: ${db_password_auth}
-      DB_SSL: ${db_user_ssl} 
+      DB_SSL: ${db_use_ssl} 
       DB_SK: ${db_sk_auth}
       ACCESS_TOKEN_LIFE: 100
       REFRESH_TOKEN_LIFE: 200
@@ -39,8 +39,26 @@ services:
     networks:
       - server_net
 
+  db_chats:
+    container_name: db_chats
+    ports:
+      - ${db_port_chats}:${db_port_chats}
+    environment:
+      POSTGRES_USER: ${db_user_chats}
+      POSTGRES_PASSWORD: ${db_password_chats}
+    image: postgres:16-alpine
+    command:
+      - 'postgres'
+      - '-c'
+      - 'port=${db_port_chats}'
+    volumes:
+      - db_chats_vol:/var/lib/postgres/data
+    networks:
+      - server_net      
+
 volumes:
   db_auth_vol: {}
+  db_chats_vol: {}
 
 networks:
   server_net:
