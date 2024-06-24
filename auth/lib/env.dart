@@ -1,10 +1,11 @@
 import 'dart:io';
 
 abstract class Env {
-  static String sk = Platform.environment['SK'] ?? 'SK';
-  static String dbSk = Platform.environment['DB_SK'] ?? 'EAOu9sI19A4AbZpI';
+  static int port = int.parse(Platform.environment['PORT']!);
+  static String sk = Platform.environment['SK']!;
+  static String dbSk = Platform.environment['DB_SK']!;
   static int accessTokenLife =
-      int.tryParse(Platform.environment['ACCESS_TOKEN_LIFE'] ?? '5') ?? 5;
+      int.parse(Platform.environment['ACCESS_TOKEN_LIFE']!);
   static int refreshTokenLife =
-      int.tryParse(Platform.environment['REFRESH_TOKEN_LIFE'] ?? '10') ?? 10;
+      int.parse(Platform.environment['REFRESH_TOKEN_LIFE']!);
 }

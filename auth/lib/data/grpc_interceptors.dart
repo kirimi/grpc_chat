@@ -5,7 +5,7 @@ import 'package:auth/env.dart';
 import 'package:grpc/grpc.dart';
 import 'package:jaguar_jwt/jaguar_jwt.dart';
 
-const excludeMethods = ['SignUp', 'SignIn', 'RefreshToken'];
+const excludeMethods = ['SignUp', 'SignIn', 'Refreshtokens'];
 
 abstract class GrpcInterceptors {
   static FutureOr<GrpcError?> tokenInterceptor(
